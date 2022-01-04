@@ -1,4 +1,4 @@
-const inputString = `17,11,37,7,89,48,99,28,56,55,57,27,83,59,53,72,6,87,33,82,13,23,35,40,71,47,78,2,39,4,51,1,67,31,79,69,15,73,80,22,92,95,91,43,26,97,36,34,12,96,86,52,66,94,61,76,64,77,85,98,42,68,84,63,60,30,65,19,54,58,24,20,25,75,93,16,18,44,14,88,45,10,9,3,70,74,81,90,46,38,21,49,29,50,0,5,8,32,62,41
+17,11,37,7,89,48,99,28,56,55,57,27,83,59,53,72,6,87,33,82,13,23,35,40,71,47,78,2,39,4,51,1,67,31,79,69,15,73,80,22,92,95,91,43,26,97,36,34,12,96,86,52,66,94,61,76,64,77,85,98,42,68,84,63,60,30,65,19,54,58,24,20,25,75,93,16,18,44,14,88,45,10,9,3,70,74,81,90,46,38,21,49,29,50,0,5,8,32,62,41
 
 57 80 91 40 12
 62 36 72  0 20
@@ -598,79 +598,4 @@ const inputString = `17,11,37,7,89,48,99,28,56,55,57,27,83,59,53,72,6,87,33,82,1
 98 80 50 96 91
 18 69 44 62 15
 20 88 12 45 28
- 8 29  0 37 27`
-
-const input = inputString.split("\n")
-
-const steps = input[0].split(",").map(Number)
-
-const boards = []
-for (let i = 2; i < input.length; i = i + 6) {
-  const row1 = input[i].match(/\d+/g).map(Number)
-  const row2 = input[i + 1].match(/\d+/g).map(Number)
-  const row3 = input[i + 2].match(/\d+/g).map(Number)
-  const row4 = input[i + 3].match(/\d+/g).map(Number)
-  const row5 = input[i + 4].match(/\d+/g).map(Number)
-
-  boards.push([row1, row2, row3, row4, row5])
-}
-
-const output = () => {
-  let marked = {}
-  for (let i = 0; i < steps.length; i++) {
-    const n = steps[i]
-    marked[n] = true
-    if (i <= 4) {
-      continue
-    }
-
-    let foundIndex
-    let found
-
-    const run = () => {
-      found = boards.find((board, index) => {
-        const foundRow = board.find((row) => row.every((cell) => marked[cell]))
-        const foundCol = new Array(5).fill(1).find((_, i) => {
-          return (
-            marked[board[0][i]] &&
-            marked[board[1][i]] &&
-            marked[board[2][i]] &&
-            marked[board[3][i]] &&
-            marked[board[4][i]]
-          )
-        })
-
-        if (foundRow || foundCol) {
-          foundIndex = index
-        }
-        return foundRow || foundCol
-      })
-
-      if (found) {
-        if (boards.length === 1) {
-          return (
-            n *
-            found.reduce(
-              (acc, cur) =>
-                acc + cur.reduce((acc, cur) => acc + (marked[cur] ? 0 : cur), 0),
-              0
-            )
-          )
-        } else {
-          boards.splice(foundIndex, 1)
-          found = null
-          return run()
-        }
-      } else {
-        return false
-      }
-    }
-
-    const ret = run()
-    if(ret) {
-      return ret
-    }
-  }
-}
-
-console.log(output())
+ 8 29  0 37 27

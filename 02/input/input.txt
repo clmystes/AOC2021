@@ -1,4 +1,4 @@
-const inputString = `forward 8
+forward 8
 forward 3
 forward 8
 down 6
@@ -997,26 +997,4 @@ forward 4
 forward 2
 up 6
 down 9
-forward 7`
-
-const input = inputString.split('\n')
-
-const DOWN = 'down '
-const UP = 'up '
-const FORWARD = 'forward '
-
-let hPos = 0
-let depth = 0
-input.forEach(command => {
-  if (command.startsWith(DOWN)) {
-    depth += parseInt(command.substring(DOWN.length))
-  } else if (command.startsWith(UP)) {
-    depth -= parseInt(command.substring(UP.length))
-  } else if (command.startsWith(FORWARD)) {
-    hPos += parseInt(command.substring(FORWARD.length))
-  }
-})
-
-const output = hPos * depth
-
-console.log(output)
+forward 7

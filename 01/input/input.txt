@@ -1,4 +1,4 @@
-const inputString = `140
+140
 154
 165
 150
@@ -1998,12 +1998,3 @@ const inputString = `140
 3591
 3595
 3596
-`
-
-const input = inputString.split('\n').map(Number)
-const output = input.reduce((prev, cur, curIdx) => {
-  if(curIdx === 0) return 0
-  return prev + (cur > input[curIdx - 1] ? 1 : 0)
-}, 0)
-
-console.log(output)

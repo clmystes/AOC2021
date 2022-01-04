@@ -1,4 +1,4 @@
-const inputString = `100000101101
+100000101101
 011011010101
 000000111000
 110101110111
@@ -997,46 +997,4 @@ const inputString = `100000101101
 101001100101
 110100110010
 101111011001
-011111101110`
-
-let oxygenInput = inputString.split("\n")
-let co2Input = oxygenInput.slice()
-const n = oxygenInput[0].length
-
-const getMost = (arr, i) => {
-  let one = []
-  let zero = []
-  arr.forEach((item, index) => {
-    if (item[i] === "1") {
-      one.push(index)
-    } else {
-      zero.push(index)
-    }
-  })
-  return { one, zero }
-}
-
-for (let i = 0; i < n; i++) {
-  if(oxygenInput.length > 1) {
-    const o = getMost(oxygenInput, i)
-
-    if (o.one.length >= o.zero.length) {
-      oxygenInput = oxygenInput.filter(item => item[i] === "1")
-    } else {
-      oxygenInput = oxygenInput.filter(item => item[i] === "0")
-    }
-  }
-
-  if(co2Input.length > 1) {
-    const c = getMost(co2Input, i)
-    if (c.one.length >= c.zero.length) {
-      co2Input = co2Input.filter(item => item[i] === "0")
-    } else {
-      co2Input = co2Input.filter(item => item[i] === "1")
-    }
-  }
-}
-
-const output = parseInt(oxygenInput[0], 2) * parseInt(co2Input[0], 2)
-
-console.log(output)
+011111101110
