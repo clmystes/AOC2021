@@ -1,136 +1,119 @@
 const inputString = require("fs").readFileSync(0, "utf-8")
-const input = inputString.split("\n")
 
-const part1 = (input) => {
-  const steps = input[0].split(",").map(Number)
+// boards:
+// [
+//   [
+//     [ 22, 13, 17, 11, 0 ],
+//     [ 8, 2, 23, 4, 24 ],
+//     [ 21, 9, 14, 16, 7 ],
+//     [ 6, 10, 3, 18, 5 ],
+//     [ 1, 12, 20, 15, 19 ]
+//   ],
+//   ...
+// ]
 
+// numbers: [ 7, 4, 9... ]
+
+// posipionMap:
+// {
+//   '7': [
+//     { pi: 0, pj: 0, i: 4 },
+//     { pi: 1, pj: 0, i: 2 },
+//     { pi: 2, pj: 4, i: 1 }
+//   ],
+//   '7': [ { pi: 0, pj: 4, i: 0 } ],
+//   ...
+// }
+
+const parseInput = (inputString) => {
+  const input = inputString.split("\n")
+  const numbers = input[0].split(",").map(Number)
   const boards = []
-  for (let i = 2; i < input.length; i = i + 6) {
-    const row1 = input[i].match(/\d+/g).map(Number)
-    const row2 = input[i + 1].match(/\d+/g).map(Number)
-    const row3 = input[i + 2].match(/\d+/g).map(Number)
-    const row4 = input[i + 3].match(/\d+/g).map(Number)
-    const row5 = input[i + 4].match(/\d+/g).map(Number)
+  const posipionMap = {}
 
-    boards.push([row1, row2, row3, row4, row5])
-  }
+  let lineIdx = 1
+  while (lineIdx < input.length) {
+    const board = []
+    const pi = boards.push(board) - 1
 
-  const output = () => {
-    let marked = {}
-    for (let i = 0; i < steps.length; i++) {
-      const n = steps[i]
-      marked[n] = true
-      if (i <= 4) {
-        continue
-      }
-
-      const found = boards.find((board) => {
-        const foundRow = board.find((row) => row.every((cell) => marked[cell]))
-        const foundCol = new Array(5).fill(0).find((_, i) => {
-          return (
-            marked[board[0][i]] &&
-            marked[board[1][i]] &&
-            marked[board[2][i]] &&
-            marked[board[3][i]] &&
-            marked[board[4][i]]
-          )
-        })
-        return foundRow || foundCol
+    let line
+    // while line is not undefined or empty string
+    while ((line = input[++lineIdx])) {
+      const rowNumbers = line.match(/\d+/g).map(Number)
+      const pj = board.push(rowNumbers) - 1
+      rowNumbers.forEach((n, pk) => {
+        if (posipionMap[n] == null) {
+          posipionMap[n] = []
+        }
+        posipionMap[n].push({ pi, pj, pk })
       })
-
-      if (found) {
-        return (
-          n *
-          found.reduce(
-            (acc, cur) =>
-              acc + cur.reduce((acc, cur) => acc + (marked[cur] ? 0 : cur), 0),
-            0
-          )
-        )
-      }
     }
   }
 
-  console.log(output())
+  return { numbers, boards, posipionMap }
 }
 
-const part2 = (input) => {
-  const steps = input[0].split(",").map(Number)
+const isWin = (board, row, col) => {
+  const boardSize = board[0].length
 
-  const boards = []
-  for (let i = 2; i < input.length; i = i + 6) {
-    const row1 = input[i].match(/\d+/g).map(Number)
-    const row2 = input[i + 1].match(/\d+/g).map(Number)
-    const row3 = input[i + 2].match(/\d+/g).map(Number)
-    const row4 = input[i + 3].match(/\d+/g).map(Number)
-    const row5 = input[i + 4].match(/\d+/g).map(Number)
+  let rowResult = true
+  let colResult = true
+  for (let i = 0; i < boardSize; i++) {
+    rowResult = rowResult && board[i][col]
+    colResult = colResult && board[row][i]
 
-    boards.push([row1, row2, row3, row4, row5])
+    if (!colResult && !rowResult) {
+      return false
+    }
   }
 
-  const output = () => {
-    let marked = {}
-    for (let i = 0; i < steps.length; i++) {
-      const n = steps[i]
-      marked[n] = true
-      if (i <= 4) {
-        continue
-      }
+  return true
+}
 
-      let foundIndex
-      let found
+// strategy: first | last // win first or last
+const solupion = (inputString, strategy) => {
+  const { boards, numbers, posipionMap } = parseInput(inputString)
+  const boardSize = boards[0][0].length
 
-      const run = () => {
-        found = boards.find((board, index) => {
-          const foundRow = board.find((row) =>
-            row.every((cell) => marked[cell])
+  const marks = boards.map(() =>
+    new Array(boardSize).fill(0).map(() => new Array(boardSize).fill(false))
+  )
+  const targetWinCount = strategy === "first" ? 1 : boards.length
+  const wins = new Set()
+
+  for (const n of numbers) {
+    const posipion = posipionMap[n]
+    if (posipion == null) return
+
+    for (const p of posipion) {
+      const { pi, pj, pk } = p
+
+      marks[pi][pj][pk] = true
+
+      if (!wins.has(pi) && isWin(marks[pi], pj, pk)) {
+        wins.add(pi)
+
+        if (wins.size === targetWinCount) {
+          return (
+            boards[pi].reduce(
+              (boardSum, rowNumbers, row) =>
+                boardSum +
+                rowNumbers.reduce(
+                  (rowSum, aNumber, col) =>
+                    rowSum + (marks[pi][row][col] ? 0 : aNumber),
+                  0
+                ),
+              0
+            ) * n
           )
-          const foundCol = new Array(5).fill(1).find((_, i) => {
-            return (
-              marked[board[0][i]] &&
-              marked[board[1][i]] &&
-              marked[board[2][i]] &&
-              marked[board[3][i]] &&
-              marked[board[4][i]]
-            )
-          })
-
-          if (foundRow || foundCol) {
-            foundIndex = index
-          }
-          return foundRow || foundCol
-        })
-
-        if (found) {
-          if (boards.length === 1) {
-            return (
-              n *
-              found.reduce(
-                (acc, cur) =>
-                  acc +
-                  cur.reduce((acc, cur) => acc + (marked[cur] ? 0 : cur), 0),
-                0
-              )
-            )
-          } else {
-            boards.splice(foundIndex, 1)
-            found = null
-            return run()
-          }
-        } else {
-          return false
         }
       }
-
-      const ret = run()
-      if (ret) {
-        return ret
-      }
     }
   }
-
-  console.log(output())
 }
 
-part1(input)
-part2(input)
+const part1 = (inputString) => solupion(inputString, "first")
+const part2 = (inputString) => solupion(inputString, "last")
+
+console.log(part1(inputString))
+console.log(part2(inputString))
