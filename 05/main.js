@@ -1,49 +1,85 @@
 const inputString = require("fs").readFileSync(0, "utf-8")
 
-const part1 = () => {
-  const points = []
-  inputString.split("\n").forEach((line) => {
+const parseInput = (inputString) => {
+  return inputString.split("\n").map((line) => {
     const [start, end] = line.split(" -> ")
     const [startX, startY] = start.split(",").map(Number)
     const [endX, endY] = end.split(",").map(Number)
+    return {
+      start: {
+        x: startX,
+        y: startY,
+      },
+      end: {
+        x: endX,
+        y: endY,
+      },
+    }
+  })
+}
 
-    if (startX !== endX && startY !== endY) {
+const solution = (inputString, isConsiderDiagonalLines) => {
+  const points = []
+  const lines = parseInput(inputString)
+
+  lines.forEach(({ start, end }) => {
+    if (!isConsiderDiagonalLines && start.x !== end.x && start.y !== end.y) {
       return
     }
 
-    if (startX === endX) {
-      const max = Math.max(startY, endY)
-      const min = Math.min(startY, endY)
+    if (start.x === end.x) {
+      const max = Math.max(start.y, end.y)
+      const min = Math.min(start.y, end.y)
 
       for (let i = min; i <= max; i++) {
-        points.push(`${startX}-${i}`)
+        points.push(`${start.x}-${i}`)
+      }
+    } else if (start.y === end.y) {
+      const max = Math.max(start.x, end.x)
+      const min = Math.min(start.x, end.x)
+
+      for (let i = min; i <= max; i++) {
+        points.push(`${i}-${start.y}`)
       }
     } else {
-      const max = Math.max(startX, endX)
-      const min = Math.min(startX, endX)
+      let x = start.x
+      let y = start.y
 
-      for (let i = min; i <= max; i++) {
-        points.push(`${i}-${startY}`)
+      while (x !== end.x && y !== end.y) {
+        points.push(`${x}-${y}`)
+        if (start.x > end.x) {
+          x--
+        } else {
+          x++
+        }
+        if (start.y > end.y) {
+          y--
+        } else {
+          y++
+        }
       }
+
+      points.push(`${end.x}-${end.y}`)
     }
   })
 
-  const map = {}
-  let counts = 0
-  points.forEach((x) => {
-    if (map[x] === 1) {
-      counts++
-      map[x]++
+  const map = {} // { "1-1": 1 }
+  return points.reduce((acc, cur) => {
+    if (map[cur] === 1) {
+      map[cur]++
+      return acc + 1
     }
 
-    if (map[x] == null) {
-      map[x] = 1
+    if (map[cur] == null) {
+      map[cur] = 1
     }
-  })
 
-  console.log(counts)
+    return acc
+  }, 0)
 }
 
-const part2 = (input) => {}
+const part1 = (inputString) => solution(inputString, false)
+const part2 = (inputString) => solution(inputString, true)
 
-part1()
+console.log(part1(inputString))
+console.log(part2(inputString))
