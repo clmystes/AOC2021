@@ -4,7 +4,7 @@ const RESET_TIMER = 6
 const NEW_TIMER = 8
 
 const solution = (inputString, days) => {
-  const input = inputString.split(",").map(Number)
+  const input = inputString.split(",").map(Number) // [3,4,3,1,2...]
   const ages = new Array(NEW_TIMER + 1).fill(0)
   input.forEach((v) => ages[v]++)
 

@@ -1,5 +1,11 @@
 const inputString = require("fs").readFileSync(0, "utf-8")
 
+// return lines: [
+//   {
+//     start: {x, y},
+//     end: {x, y}
+//   }
+// ]
 const parseInput = (inputString) => {
   return inputString.split("\n").map((line) => {
     const [start, end] = line.split(" -> ")
@@ -19,11 +25,16 @@ const parseInput = (inputString) => {
 }
 
 const solution = (inputString, isConsiderDiagonalLines) => {
-  const points = []
+  const points = [] // ["1-1", "1-2"]
   const lines = parseInput(inputString)
 
   lines.forEach(({ start, end }) => {
     if (!isConsiderDiagonalLines && start.x !== end.x && start.y !== end.y) {
+      console.warn(
+        `For now, only consider horizontal and vertical lines: lines where either x1 = x2 or y1 = y2. But input is ${JSON.stringify(
+          start
+        )} ${JSON.stringify(end)}.`
+      )
       return
     }
 
