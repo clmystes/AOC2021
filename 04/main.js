@@ -14,14 +14,14 @@ const inputString = require("fs").readFileSync(0, "utf-8")
 
 // numbers: [ 7, 4, 9... ]
 
-// posipionMap:
+// positionMap:
 // {
 //   '7': [
-//     { pi: 0, pj: 0, i: 4 },
-//     { pi: 1, pj: 0, i: 2 },
-//     { pi: 2, pj: 4, i: 1 }
+//     { pi: 0, pj: 0, pk: 4 },
+//     { pi: 1, pj: 0, pk: 2 },
+//     { pi: 2, pj: 4, pk: 1 }
 //   ],
-//   '7': [ { pi: 0, pj: 4, i: 0 } ],
+//   '7': [ { pi: 0, pj: 4, pk: 0 } ],
 //   ...
 // }
 
@@ -29,7 +29,7 @@ const parseInput = (inputString) => {
   const input = inputString.split("\n")
   const numbers = input[0].split(",").map(Number)
   const boards = []
-  const posipionMap = {}
+  const positionMap = {}
 
   let lineIdx = 1
   while (lineIdx < input.length) {
@@ -42,15 +42,15 @@ const parseInput = (inputString) => {
       const rowNumbers = line.match(/\d+/g).map(Number)
       const pj = board.push(rowNumbers) - 1
       rowNumbers.forEach((n, pk) => {
-        if (posipionMap[n] == null) {
-          posipionMap[n] = []
+        if (positionMap[n] == null) {
+          positionMap[n] = []
         }
-        posipionMap[n].push({ pi, pj, pk })
+        positionMap[n].push({ pi, pj, pk })
       })
     }
   }
 
-  return { numbers, boards, posipionMap }
+  return { numbers, boards, positionMap }
 }
 
 const isWin = (board, row, col) => {
@@ -71,8 +71,8 @@ const isWin = (board, row, col) => {
 }
 
 // strategy: first | last // win first or last
-const solupion = (inputString, strategy) => {
-  const { boards, numbers, posipionMap } = parseInput(inputString)
+const solution = (inputString, strategy) => {
+  const { boards, numbers, positionMap } = parseInput(inputString)
   const boardSize = boards[0][0].length
 
   const marks = boards.map(() =>
@@ -82,10 +82,11 @@ const solupion = (inputString, strategy) => {
   const wins = new Set()
 
   for (const n of numbers) {
-    const posipion = posipionMap[n]
-    if (posipion == null) return
+    const position = positionMap[n]
 
-    for (const p of posipion) {
+    console.assert(position == null, "position not found")
+
+    for (const p of position) {
       const { pi, pj, pk } = p
 
       marks[pi][pj][pk] = true
@@ -112,8 +113,8 @@ const solupion = (inputString, strategy) => {
   }
 }
 
-const part1 = (inputString) => solupion(inputString, "first")
-const part2 = (inputString) => solupion(inputString, "last")
+const part1 = (inputString) => solution(inputString, "first")
+const part2 = (inputString) => solution(inputString, "last")
 
 console.log(part1(inputString))
 console.log(part2(inputString))
