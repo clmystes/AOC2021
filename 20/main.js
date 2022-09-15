@@ -51,7 +51,7 @@ const run = (input, times) => {
             x,
             y,
             [0 - i, 0 - i, width + i - 1, height + i - 1],
-            algo[0b000000000] === "#" ? i % 2 : 0,
+            i % 2 === 0 ? "0" : "1",
             map
           ) === "#"
         ) {
